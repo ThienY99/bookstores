@@ -84,5 +84,34 @@ public class BookController {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 
+    @PutMapping("/stock")
+    public ResponseEntity<String> updateStock(
+            @RequestParam("isbn") String isbn,
+            @RequestParam("stock") int stock) {
+
+        if (stock < 0) {
+            return new ResponseEntity<>(
+                    "Stcok mag niet negatief zijn.",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        Optional<Book> result = bookRepository.findById(isbn);
+        if (result.isPresent()) {
+            Book book = result.get();
+
+            book.setStock(stock);
+            bookRepository.save(book);
+            return new ResponseEntity<>(
+                    "Stock aangepast.",
+                    HttpStatus.OK
+            );
+        } else {
+            return new ResponseEntity<>(
+                    "Boek niet gevonden.",
+                    HttpStatus.NOT_FOUND
+            );
+        }
+    }
 
 }
