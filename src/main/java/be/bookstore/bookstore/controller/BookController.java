@@ -114,4 +114,36 @@ public class BookController {
         }
     }
 
+    @PutMapping("/price")
+    public ResponseEntity<String> updatePrice(
+            @RequestParam("isbn") String isbn,
+            @RequestParam("price") BigDecimal price) {
+
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            return new ResponseEntity<>(
+                    "Prijs mag niet negatief zijn.",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        Optional<Book> result = bookRepository.findById(isbn);
+
+        if (result.isPresent()) {
+            Book book = result.get();
+
+            book.setPrice(price);
+            bookRepository.save(book);
+            return new ResponseEntity<>(
+                    "Prijs aangepast.",
+                    HttpStatus.OK
+            );
+        }
+        else {
+            return new ResponseEntity<>(
+                    "Boek niet gevonden.",
+                    HttpStatus.NOT_FOUND
+            );
+        }
+    }
+
 }
