@@ -30,7 +30,7 @@ public class BookController {
     public ResponseEntity<String> addBook(
             @RequestParam("isbn") String isbn,
             @RequestParam("title") String title,
-            @RequestParam("authors") String authors,
+            @RequestParam("author") String author,
             @RequestParam("description") String description,
             @RequestParam("price") BigDecimal price,
             @RequestParam("stock") int stock,
@@ -51,7 +51,7 @@ public class BookController {
         Book book = new Book(
                 isbn,
                 title,
-                authors,
+                author,
                 description,
                 price,
                 stock,
@@ -91,7 +91,7 @@ public class BookController {
 
         if (stock < 0) {
             return new ResponseEntity<>(
-                    "Stcok mag niet negatief zijn.",
+                    "Stock mag niet negatief zijn.",
                     HttpStatus.BAD_REQUEST
             );
         }
@@ -139,6 +139,25 @@ public class BookController {
             );
         }
         else {
+            return new ResponseEntity<>(
+                    "Boek niet gevonden.",
+                    HttpStatus.NOT_FOUND
+            );
+        }
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteBook(
+            @RequestParam("isbn") String isbn) {
+
+        if (bookRepository.existsById(isbn)) {
+            bookRepository.deleteById(isbn);
+
+            return new ResponseEntity<>(
+                    "Boek verwijderd.",
+                    HttpStatus.OK
+            );
+        } else {
             return new ResponseEntity<>(
                     "Boek niet gevonden.",
                     HttpStatus.NOT_FOUND
