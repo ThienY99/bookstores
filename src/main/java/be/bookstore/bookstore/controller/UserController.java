@@ -1,6 +1,9 @@
 package be.bookstore.bookstore.controller;
 
+import be.bookstore.bookstore.model.AppUser;
 import be.bookstore.bookstore.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -42,6 +45,33 @@ public class UserController {
                     "Gebruiker kon niet worden opgeslagen. "
                             + "Mogelijk is het e-mailadres al geregistreerd.",
                     HttpStatus.CONFLICT
+            );
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            HttpServletRequest request) {
+
+        try {
+            AppUser user = userService.checkLogin(email, password);
+
+            HttpSession session = request.getSession();
+            request.changeSessionId();
+
+            session.setAttribute("userId", user.getId());
+
+            return new ResponseEntity<>(
+                    "Je bent ingelogd.",
+                    HttpStatus.OK
+            );
+
+        } catch (IllegalArgumentException exception) {
+            return new ResponseEntity<>(
+                    "E-mailadres of wachtwoord is onjuist.",
+                    HttpStatus.UNAUTHORIZED
             );
         }
     }
