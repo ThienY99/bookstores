@@ -8,10 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -74,5 +71,49 @@ public class UserController {
                     HttpStatus.UNAUTHORIZED
             );
         }
+    }
+
+    @GetMapping("/session")
+    public ResponseEntity<String> checkSession(
+            HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null) {
+            return new ResponseEntity<>(
+                    "Je bent niet ingelogd.",
+                    HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+
+        if (userId == null) {
+            return new ResponseEntity<>(
+                    "Je bent niet ingelogd.",
+                    HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        return new ResponseEntity<>(
+                "Je bent ingelogd als gebruiker " + userId + ".",
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(
+            HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return new ResponseEntity<>(
+                "Je bent uitgelogd.",
+                HttpStatus.OK
+        );
     }
 }
