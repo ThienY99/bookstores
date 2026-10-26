@@ -86,7 +86,7 @@ public class UserController {
             );
         }
 
-        Long userId = (Long) session.getAttribute("userId");
+        Integer userId = (Integer) session.getAttribute("userId");
 
         if (userId == null) {
             return new ResponseEntity<>(
